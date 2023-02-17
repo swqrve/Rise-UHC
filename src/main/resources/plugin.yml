@@ -1,0 +1,47 @@
+name: RiseUHC
+version: ${project.version}
+main: me.swerve.riseuhc.RiseUHC
+author: AcidRise
+description: A UHC Core created by AcidRise.
+commands:
+  manage:
+    aliases: [manageuhc, uhcmanage, edituhc, edit]
+  spectate:
+    aliases: [spec, spectator]
+  scenario:
+    aliases: [scens, scenarios]
+  mutechat:
+    aliases: [mc, chatmute]
+  config:
+    aliases: [uhc, information, info, configuration, conf, whataretheconfigurationoptions, what]
+  practice:
+    aliases: [prac, p, arena, a]
+  cpractice:
+    aliases: [ cprac ]
+  updateterrain:
+    aliases: [updateores, oresupdate]
+  killtop:
+    aliases: [kt]
+  health:
+    aliases: [h]
+  kills:
+    aliases: [k, kc]
+  helpop:
+    aliases: [request]
+  helpopreply:
+    aliases: [helpreply, requestreply]
+  respawn:
+  clearchat:
+    aliases: [cc]
+  whitelisttoggle:
+    aliases: [whitelist]
+  discord:
+    aliases: [disc]
+  twitter:
+    aliases: [ twit ]
+  schedule:
+    aliases: [sched]
+  latescatter:
+    aliases: [latejoin]
+  cancel:
+  heal:

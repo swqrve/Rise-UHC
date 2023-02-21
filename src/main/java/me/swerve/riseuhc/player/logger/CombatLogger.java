@@ -4,11 +4,14 @@ import lombok.Getter;
 import me.swerve.riseuhc.RiseUHC;
 import me.swerve.riseuhc.manager.UHCManager;
 import me.swerve.riseuhc.player.UHCPlayer;
+import me.swerve.riseuhc.scenario.Scenario;
+import me.swerve.riseuhc.scenario.scen.TimeBomb;
+import me.swerve.riseuhc.util.ItemCreator;
+import me.swerve.riseuhc.util.KillTopPlayer;
+import me.swerve.riseuhc.util.TimeBombUtil;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -25,7 +28,6 @@ import java.util.*;
 public class CombatLogger implements Listener {
     @Getter private static final Map<UUID, CombatLogger> loggers = new HashMap<>();
 
-    private final Player loggedPlayer;
     @Getter private Villager logger;
 
     @Getter private final ItemStack[] contents;
@@ -38,9 +40,9 @@ public class CombatLogger implements Listener {
 
     @Getter private final int xp;
 
-    public CombatLogger(Player p) {
-        this.loggedPlayer = p;
+    @Getter private Chunk chunk;
 
+    public CombatLogger(Player p) {
         this.contents = p.getInventory().getContents();
         this.armorContents = p.getInventory().getArmorContents();
 
@@ -49,6 +51,8 @@ public class CombatLogger implements Listener {
         this.spawnLocation = p.getLocation();
 
         this.xp = p.getTotalExperience();
+
+        this.chunk = p.getLocation().getChunk();
 
         createLogger(p.getHealth());
 
@@ -97,24 +101,42 @@ public class CombatLogger implements Listener {
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent e) {
-        if (!(e.getEntity() instanceof Zombie)) return;
+        if (!(e.getEntity() instanceof Villager)) return;
 
         if (e.getEntity().getUniqueId() == logger.getUniqueId()) {
+            e.getDrops().clear();
             dead = true;
 
             e.getDrops().addAll(Arrays.asList(contents));
             e.getDrops().addAll(Arrays.asList(armorContents));
 
+            if (Scenario.getScenarioByTitle("TimeBomb").isEnabled()) {
+                new TimeBombUtil(playerName, e.getDrops(), e.getEntity().getLocation());
+                e.getDrops().clear();
+            } else e.getDrops().add(new ItemCreator(Material.SKULL_ITEM, 1).setOwner(playerName).getItem());
+
+
             if (e.getEntity().getKiller() != null) {
-                lowerPlayerCount();
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c" + e.getEntity().getCustomName() + "&6(&fCombat Logger&6) &cwas slain by " + e.getEntity().getKiller().getDisplayName() + "."));
+                UHCPlayer.getUhcPlayers().get(e.getEntity().getKiller().getUniqueId()).setCurrentKills(UHCPlayer.getUhcPlayers().get(e.getEntity().getKiller().getUniqueId()).getCurrentKills() + 1);
+
+                boolean found = false;
+                for (KillTopPlayer p : KillTopPlayer.getKillers()) {
+                    if (Objects.equals(ChatColor.stripColor(p.getName()), ChatColor.stripColor(e.getEntity().getKiller().getDisplayName()))) {
+                        found = true;
+                        p.setKills(p.getKills() + 1);
+                        break;
+                    }
+                }
+
+                if (!found) new KillTopPlayer(e.getEntity().getKiller().getDisplayName(), 1);
+
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c" + playerName + "&6(&fCombat Logger&6) &cwas slain by &a" + e.getEntity().getKiller().getDisplayName() + "&7[&f" + UHCPlayer.getUhcPlayers().get(e.getEntity().getKiller().getUniqueId()).getCurrentKills() + "&7]."));
                 UHCPlayer player = UHCPlayer.getUhcPlayers().get(e.getEntity().getKiller().getUniqueId());
                 if (player.getPlayerObject() == null) return;
                 player.setCurrentKills(player.getCurrentKills() + 1);
                 return;
             }
 
-            lowerPlayerCount();
             Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&c" + e.getEntity().getCustomName() + "&6(&fCombat Logger&6) &chas expired. (10 Minutes)"));
             HandlerList.unregisterAll(this);
         }
@@ -126,7 +148,4 @@ public class CombatLogger implements Listener {
         if (e.getEntity().getUniqueId() == logger.getUniqueId()) e.setCancelled(true);
     }
 
-    private void lowerPlayerCount() {
-        UHCManager.getInstance().getGame().getGamePlayers().remove(UHCPlayer.getUhcPlayers().get(loggedPlayer.getUniqueId()));
-    }
 }

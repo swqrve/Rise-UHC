@@ -35,8 +35,9 @@ public class KillTopCommand implements CommandExecutor {
 
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&m-------------------------"));
         for (int i = KillTopPlayer.getKillers().size() - 1; i >= KillTopPlayer.getKillers().size() - 10; i--) {
+            if (i < 0 || i > KillTopPlayer.getKillers().size() - 1 || KillTopPlayer.getKillers().get(i) == null) continue;
             String playerColorCode = "&a";
-            if (KillTopPlayer.getKillers().get(i).isDead()) playerColorCode = "&a&m";
+            if (KillTopPlayer.getKillers().get(i).isDead()) playerColorCode = "&c&m";
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', playerColorCode + KillTopPlayer.getKillers().get(i).getName() + ": &7" + KillTopPlayer.getKillers().get(i).getKills()));
         }
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6&m-------------------------"));

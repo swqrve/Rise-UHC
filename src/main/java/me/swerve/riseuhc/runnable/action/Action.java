@@ -52,6 +52,8 @@ public class Action {
                         .addAction(borderTime, "&f[&6RiseUHC&f] Border has shrunk to &7[&f" + BorderUtil.nextBorder(UHCManager.getInstance().getGame().getCurrentBorder()) + "x" + BorderUtil.nextBorder(UHCManager.getInstance().getGame().getCurrentBorder()) + "&7]", TimedAction.ActionType.SHRINK_BORDER);
 
                 for (int i = 10; i > 0; i--) {
+                    if (i > 5 && i != 10) continue;
+
                     String withS = " Seconds";
                     if (i == 1) withS = " Second";
 

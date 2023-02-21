@@ -72,7 +72,7 @@ public class DamageListener implements Listener {
                 Player damager = (Player) arrow.getShooter();
                 Player damaged = (Player) e.getEntity();
 
-                Bukkit.getScheduler().runTaskLater(RiseUHC.getInstance(), () -> damager.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6" + damaged.getName() + " &fis now at &6" + (int) Math.floor((damaged.getHealth() / 20) * 100)) + "%"), 7);
+                Bukkit.getScheduler().runTaskLater(RiseUHC.getInstance(), () -> damager.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6" + damaged.getName() + " &fis now at &6" + (int) Math.floor((damaged.getHealth() / 20) * 100)) + "%"), 12);
             }
         }
 

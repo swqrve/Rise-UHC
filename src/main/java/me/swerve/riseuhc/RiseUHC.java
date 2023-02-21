@@ -8,6 +8,8 @@ import me.swerve.riseuhc.bot.TwitterBot;
 import me.swerve.riseuhc.command.*;
 import me.swerve.riseuhc.listener.*;
 import me.swerve.riseuhc.manager.UHCManager;
+import me.swerve.riseuhc.runnable.SchedulerRunnable;
+import me.swerve.riseuhc.runnable.TimeRunnable;
 import me.swerve.riseuhc.scenario.Scenario;
 import me.swerve.riseuhc.scoreboard.ScoreBoardManager;
 import me.swerve.riseuhc.world.WorldManager;
@@ -41,6 +43,8 @@ public final class RiseUHC extends JavaPlugin {
             new DiscordBot();
             new TwitterBot();
         } catch (Exception e) { e.printStackTrace(); }
+
+        new TimeRunnable().runTaskTimer(RiseUHC.getInstance(), 0, 200);
     }
 
     @Override

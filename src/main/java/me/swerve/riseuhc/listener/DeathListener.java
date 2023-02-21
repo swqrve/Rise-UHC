@@ -80,7 +80,7 @@ public class DeathListener implements Listener {
         if (e.getEntity().getKiller() == null) {
             e.getDeathMessage().replaceAll(e.getEntity().getDisplayName(), "&a" + e.getEntity().getDisplayName() + "&7[&f" + UHCPlayer.getUhcPlayers().get(e.getEntity().getUniqueId()).getCurrentKills() + "&7]&c");
             e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', "&c" + e.getDeathMessage()));
-        } else e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', "&a" + e.getEntity().getDisplayName() + "&7[&f" + UHCPlayer.getUhcPlayers().get(e.getEntity().getUniqueId()).getCurrentKills() + "&7]" + "&cwas slain by &a"  + e.getEntity().getKiller().getDisplayName() + "&7[&f" + UHCPlayer.getUhcPlayers().get(e.getEntity().getKiller().getUniqueId()).getCurrentKills() + "&7]."));
+        } else e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', "&a" + e.getEntity().getDisplayName() + "&7[&f" + UHCPlayer.getUhcPlayers().get(e.getEntity().getUniqueId()).getCurrentKills() + "&7]" + " &cwas slain by &a"  + e.getEntity().getKiller().getDisplayName() + "&7[&f" + UHCPlayer.getUhcPlayers().get(e.getEntity().getKiller().getUniqueId()).getCurrentKills() + "&7]."));
 
     }
 }

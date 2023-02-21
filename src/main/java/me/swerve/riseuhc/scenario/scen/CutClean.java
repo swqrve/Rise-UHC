@@ -61,7 +61,7 @@ public class CutClean extends Scenario {
                 block.getState().update(true);
                 if (e.getPlayer().getItemInHand().getType() == Material.DIAMOND_PICKAXE || e.getPlayer().getItemInHand().getType() == Material.IRON_PICKAXE) {
                     ItemUtil.dropItem(new ItemStack(Material.GOLD_INGOT, 1), block.getLocation());
-                    block.getWorld().spawn(block.getLocation(), ExperienceOrb.class).setExperience(3);
+                    block.getWorld().spawn(block.getLocation(), ExperienceOrb.class).setExperience(2);
                 }
                 break;
             case IRON_ORE:
@@ -72,7 +72,7 @@ public class CutClean extends Scenario {
                 block.setType(Material.AIR);
                 block.getState().update(true);
                 ItemUtil.dropItem(new ItemStack(Material.IRON_INGOT, 1), block.getLocation());
-                block.getWorld().spawn(block.getLocation(), ExperienceOrb.class).setExperience(3);
+                block.getWorld().spawn(block.getLocation(), ExperienceOrb.class).setExperience(2);
 
                 break;
             case GRAVEL:

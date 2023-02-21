@@ -89,7 +89,7 @@ public class ConnectionListener implements Listener {
                 e.getPlayer().getScoreboard().getTeam("color").addPlayer(player);
                 player.getScoreboard().getTeam("color").addPlayer(e.getPlayer());
             }
-        }, 10);
+        }, 20);
     }
 
     @EventHandler

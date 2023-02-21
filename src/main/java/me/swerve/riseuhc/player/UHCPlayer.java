@@ -169,6 +169,7 @@ public class UHCPlayer {
 
 
     public void respawn() {
+        if (getPlayerObject() == null) return;
         currentState = PlayerState.PLAYING;
 
         resetPlayer();

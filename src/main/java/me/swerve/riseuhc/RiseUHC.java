@@ -7,6 +7,7 @@ import me.swerve.riseuhc.bot.DiscordBot;
 import me.swerve.riseuhc.bot.TwitterBot;
 import me.swerve.riseuhc.command.*;
 import me.swerve.riseuhc.listener.*;
+import me.swerve.riseuhc.manager.TeamManager;
 import me.swerve.riseuhc.manager.UHCManager;
 import me.swerve.riseuhc.runnable.SchedulerRunnable;
 import me.swerve.riseuhc.runnable.TimeRunnable;
@@ -36,6 +37,7 @@ public final class RiseUHC extends JavaPlugin {
         new Assemble(this, new ScoreBoardManager());
 
         new UHCManager();
+        new TeamManager();
 
         Bukkit.createWorld(new WorldCreator("uhc_practice").environment(World.Environment.NORMAL).type(WorldType.NORMAL));
 
@@ -97,5 +99,9 @@ public final class RiseUHC extends JavaPlugin {
         Bukkit.getPluginCommand("heal").setExecutor(new HealCommand());
         Bukkit.getPluginCommand("clearchat").setExecutor(new ClearChatCommand());
         Bukkit.getPluginCommand("latescatter").setExecutor(new LateScatterCommand());
+        Bukkit.getPluginCommand("crash").setExecutor(new CrashCommand());
+        Bukkit.getPluginCommand("fly").setExecutor(new FlyCommand());
+        Bukkit.getPluginCommand("gm").setExecutor(new GameModeCommand());
+        Bukkit.getPluginCommand("team").setExecutor(new TeamCommand());
     }
 }

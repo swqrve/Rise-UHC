@@ -15,6 +15,8 @@ public class DurabilityListener implements Listener {
         if (e.getItem().getType() == Material.FISHING_ROD) {
             e.setDamage(1);
         }
+
+        for (String filter : itemBreakFilter) if (e.getItem().getType().toString().toLowerCase().contains(filter.toLowerCase())) if (e.getDamage() > 1) e.setDamage(1);
     }
 
     @EventHandler

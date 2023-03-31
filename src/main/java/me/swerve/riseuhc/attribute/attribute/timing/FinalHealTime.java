@@ -9,6 +9,6 @@ public class FinalHealTime extends MatchAttribute {
 
         for (int i = 6; i > 0; i--) getOptions().add(new AttributeValue("" + 5 * i, 5 * i));
 
-        setCurrentSelection(getOptions().get(3));
+        setCurrentSelection(getOptions().get(4));
     }
 }

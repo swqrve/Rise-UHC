@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import me.swerve.riseuhc.RiseUHC;
 import me.swerve.riseuhc.attribute.MatchAttribute;
+import me.swerve.riseuhc.manager.TeamManager;
 import me.swerve.riseuhc.manager.UHCManager;
 import me.swerve.riseuhc.player.UHCPlayer;
 import me.swerve.riseuhc.runnable.GameRunnable;
 import me.swerve.riseuhc.runnable.GameStartRunnable;
 import me.swerve.riseuhc.scenario.Scenario;
+import me.swerve.riseuhc.team.Team;
 import me.swerve.riseuhc.util.ScatterLocation;
 import me.swerve.riseuhc.util.SitUtil;
 import org.apache.commons.io.FileUtils;
@@ -33,6 +35,8 @@ public class UHCGame {
     @Getter @Setter private int currentBorder;
 
     @Getter private UHCPlayer winner;
+    @Getter private int teamKills;
+
     @Getter private int secondsTillRestart = 30;
 
     public UHCGame(List<UHCPlayer> players) {
@@ -42,11 +46,27 @@ public class UHCGame {
         initialPlayerCount = getGamePlayers().size();
         currentBorder = (int) MatchAttribute.getAttributeFromName("Border Size").getCurrentSelection().getValue();
 
+        if ((int) MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getValue() != 1) {
+            for (UHCPlayer p : getGamePlayers()) {
+                boolean hasTeam = false;
+                for (Team team : TeamManager.getInstance().getTeamsList()) {
+                    if (team.isMember(p.getUuid())) {
+                        hasTeam = true;
+                        break;
+                    }
+                }
+
+                if (!hasTeam) {
+                    new Team(p.getUuid());
+                    p.getPlayerObject().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cA team was created for you since you didn't have one!"));
+                }
+            }
+        }
+
         scatterPlayers();
     }
 
     public void scatterPlayers() {
-        // Set Scatter Locations
         UHCManager.getInstance().setCurrentGameState(UHCManager.GameState.SCATTERING);
         UHCManager.getInstance().setInitialScatterCount(getGamePlayers().size());
 
@@ -56,11 +76,39 @@ public class UHCGame {
         final World world = Bukkit.getWorld("uhc_world");
 
         List<Chunk> chunksToLoad = new ArrayList<>();
-        for (UHCPlayer player : getGamePlayers()) {
-            player.setLoc(getSafeLocation(world, borderSize));
+        if ((int) MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getValue() != 1) {
+            for (UHCPlayer player : getGamePlayers()) {
+                Team currentTeam = null;
+                for (Team team : TeamManager.getInstance().getTeamsList()) {
 
-            chunksToLoad.add(world.getChunkAt(x, z));
-            UHCManager.getInstance().setChunksLoaded(UHCManager.getInstance().getChunksLoaded() + 1);
+                    if (team.isMember(player.getUuid())) {
+                        currentTeam = team;
+                        break;
+                    }
+                }
+
+                if (currentTeam == null) continue; // SHOULD NOT BE POSSIBLE
+
+                ScatterLocation safeLoc;
+                if (currentTeam.getTeamScatterLoc() != null) safeLoc = currentTeam.getTeamScatterLoc();
+                else safeLoc = getSafeLocation(world, borderSize);
+
+                if (currentTeam.getTeamScatterLoc() == null) {
+                    chunksToLoad.add(world.getChunkAt(x, z));
+                    UHCManager.getInstance().setChunksLoaded(UHCManager.getInstance().getChunksLoaded() + 1);
+
+                    currentTeam.setTeamScatterLoc(safeLoc);
+                }
+
+                player.setLoc(safeLoc);
+            }
+        } else {
+            for (UHCPlayer player : getGamePlayers()) {
+                player.setLoc(getSafeLocation(world, borderSize));
+
+                chunksToLoad.add(world.getChunkAt(x, z));
+                UHCManager.getInstance().setChunksLoaded(UHCManager.getInstance().getChunksLoaded() + 1);
+            }
         }
 
         chunksToLoad.forEach(chunk -> chunk.load(true));
@@ -110,15 +158,19 @@ public class UHCGame {
 
         if (winners.size() > 1) {
             StringBuilder playerWinBuilder = new StringBuilder();
+            int totalKills = 0;
             for (int i = 0; i < winners.size(); i++) {
                 if (i == winners.size() - 1) playerWinBuilder.append(", and ");
                 else if (i != 0) playerWinBuilder.append(", ");
 
                 playerWinBuilder.append(winners.get(i).getPlayerObject().getDisplayName());
+                totalKills += winners.get(i).getCurrentKills();
             }
 
-            // winner = player; // TODO: If a team wins right now, there will be an error. There needs to be a way for the scoreboard to get the winner text since I updated it for cleaner kills tracking
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&f[&6RiseUHC&f] &fCongratulations to " + playerWinBuilder + " &ffor winning the UHC!"));
+            teamKills = totalKills;
+            winner = winners.get(0);
+
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&f[&6RiseUHC&f] &fCongratulations to " + playerWinBuilder + " &ffor winning the UHC with a total of " + totalKills + " kills!"));
         }
 
         for (UHCPlayer player : winners) scheduleFireWorks(player.getPlayerObject());

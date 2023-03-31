@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -43,14 +44,14 @@ public class NoClean extends Scenario {
         }, 20 * 20);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player)) return;
         Player damagedPlayer = (Player) e.getEntity();
         if (noCleanPlayers.contains(damagedPlayer.getUniqueId())) e.setCancelled(true);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamagePlayer(EntityDamageByEntityEvent e) {
         if (!(e.getEntity() instanceof Player))  return;
         UUID hitUUID = null;
@@ -73,7 +74,7 @@ public class NoClean extends Scenario {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerFish(PlayerFishEvent e){
         if(e.getState() != PlayerFishEvent.State.CAUGHT_ENTITY) return;
         if (!(e.getCaught() instanceof Player)) return;

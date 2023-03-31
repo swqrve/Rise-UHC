@@ -6,6 +6,7 @@ import me.swerve.riseuhc.manager.UHCManager;
 import me.swerve.riseuhc.menu.board.*;
 import me.swerve.riseuhc.player.UHCPlayer;
 import me.swerve.riseuhc.scenario.Scenario;
+import me.swerve.riseuhc.util.ItemCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -27,10 +28,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.spigotmc.event.entity.EntityMountEvent;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class InteractListener implements Listener {
+    DecimalFormat df = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
 
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
@@ -57,7 +62,8 @@ public class InteractListener implements Listener {
 
         if (e.getCurrentItem().getType().toString().contains("BARDING")) {
             if (!(boolean) MatchAttribute.getAttributeFromName("Horse Armor").getCurrentSelection().getValue()) {
-                ((Player) e.getWhoClicked()).sendMessage(ChatColor.translateAlternateColorCodes('&', "&cHorse armor is disabled."));
+                e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cHorse armor is disabled."));
+                e.setCurrentItem(new ItemStack(Material.AIR));
                 e.setCancelled(true);
             }
         }
@@ -119,13 +125,49 @@ public class InteractListener implements Listener {
         }
 
         if (UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentState() == UHCPlayer.PlayerState.SPECTATING) {
+            UHCManager manager = UHCManager.getInstance();
+            Player p = e.getPlayer();
+            if (e.getItem().getType() == Material.INK_SACK) {
+                byte data = e.getPlayer().getItemInHand().getData().getData();
+
+                if (manager.getLastToggledVisibility().get(p.getUniqueId()) != null && System.currentTimeMillis() - ((manager.getLastToggledVisibility().get(p.getUniqueId()))) < 3000L) {
+                    long countDownTime = 3000L - ((System.currentTimeMillis() - manager.getLastToggledVisibility().get(p.getUniqueId())));
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou have to wait another " + df.format(countDownTime / 1000L) + " seconds before you can use this again!"));
+                    return;
+                }
+
+                manager.getLastToggledVisibility().put(p.getUniqueId(), System.currentTimeMillis());
+
+                if (data == 8) {
+                    for (Player toShow : Bukkit.getOnlinePlayers()) toShow.showPlayer(p);
+                    if (!manager.getToggledVisibility().contains(p.getUniqueId())) manager.getToggledVisibility().add(p.getUniqueId());
+
+                    ItemCreator clone = new ItemCreator(manager.getToggleVisibilityItem());
+                    clone.setData(10);
+                    clone.setName(ChatColor.translateAlternateColorCodes('&', "&a" + ChatColor.stripColor(clone.getMeta().getDisplayName())));
+
+                    p.setItemInHand(clone.getItem());
+                    p.updateInventory();
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou are now visible to other players."));
+                    return;
+                }
+
+                for (Player toHide : Bukkit.getOnlinePlayers()) toHide.hidePlayer(p);
+                manager.getToggledVisibility().remove(p.getUniqueId());
+                p.setItemInHand(manager.getToggleVisibilityItem().getItem());
+                p.updateInventory();
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou are now invisible to other players."));
+
+                return;
+            }
+
             if (UHCManager.getInstance().getGame() == null) {
                 e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cThere is no game running right now."));
                 return;
             }
 
             if (e.getItem().getType() == Material.COMPASS) {
-                if (e.getPlayer().hasPermission("uhc.spectate")) {
+                if (e.getPlayer().hasPermission("uhc.modspectate")) {
                     Bukkit.getPluginManager().registerEvents(new PlayerMenu(e.getPlayer(), true), RiseUHC.getInstance());
                     return;
                 }
@@ -140,7 +182,7 @@ public class InteractListener implements Listener {
                     return;
                 }
 
-                if (e.getPlayer().hasPermission("uhc.spectate")) {
+                if (e.getPlayer().hasPermission("uhc.modspectate")) {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cTeleporting to a random player.."));
                     e.getPlayer().teleport(UHCManager.getInstance().getGame().getGamePlayers().get(Scenario.getRandom().nextInt(UHCManager.getInstance().getGame().getGamePlayers().size() - 1)).getPlayerObject().getLocation());
                     return;

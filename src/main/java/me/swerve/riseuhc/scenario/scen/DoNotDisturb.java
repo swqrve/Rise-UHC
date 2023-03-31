@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -35,7 +36,7 @@ public class DoNotDisturb extends Scenario {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(RiseUHC.getInstance(), dndTimer, 0, 3);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         if (!(e.getEntity() instanceof Player)) return;
         UUID hitUUID = null;
@@ -56,7 +57,7 @@ public class DoNotDisturb extends Scenario {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerFish(PlayerFishEvent e){
         if(e.getState() != PlayerFishEvent.State.CAUGHT_ENTITY) return;
         if (!(e.getCaught() instanceof Player)) return;

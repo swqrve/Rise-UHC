@@ -3,10 +3,7 @@ package me.swerve.riseuhc.listener;
 import me.swerve.riseuhc.attribute.MatchAttribute;
 import me.swerve.riseuhc.scenario.Scenario;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -37,7 +34,7 @@ public class SpawnListener implements Listener {
             return;
         }
 
-        if (e.getEntity() instanceof Rabbit) {
+        if (e.getEntity() instanceof Rabbit || e.getEntity() instanceof Wolf) {
             e.setCancelled(true);
             e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.COW);
         }

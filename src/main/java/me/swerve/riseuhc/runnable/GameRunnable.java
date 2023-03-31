@@ -1,11 +1,16 @@
 package me.swerve.riseuhc.runnable;
 
+import com.lunarclient.bukkitapi.LunarClientAPI;
 import lombok.Getter;
 import lombok.Setter;
 import me.swerve.riseuhc.attribute.MatchAttribute;
 import me.swerve.riseuhc.game.UHCGame;
+import me.swerve.riseuhc.manager.TeamManager;
 import me.swerve.riseuhc.manager.UHCManager;
+import me.swerve.riseuhc.player.UHCPlayer;
+import me.swerve.riseuhc.player.logger.CombatLogger;
 import me.swerve.riseuhc.runnable.action.TimedAction;
+import me.swerve.riseuhc.team.Team;
 import me.swerve.riseuhc.util.BorderUtil;
 import me.swerve.riseuhc.util.ItemCreator;
 import org.bukkit.Bukkit;
@@ -18,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class GameRunnable extends BukkitRunnable {
     @Getter @Setter private int taskId;
@@ -68,6 +74,8 @@ public class GameRunnable extends BukkitRunnable {
                 .addAction(borderTime, "&f[&6RiseUHC&f] Border has shrunk to &7[&f" + BorderUtil.nextBorder(game.getCurrentBorder()) + "x" + BorderUtil.nextBorder(game.getCurrentBorder()) + "&7]", TimedAction.ActionType.SHRINK_BORDER);
 
         for (int i = 10; i > 0; i--) {
+            if (i > 5 && i != 10) continue;
+
             String withS = " Seconds";
             if (i == 1) withS = " Second";
 
@@ -86,10 +94,40 @@ public class GameRunnable extends BukkitRunnable {
         setGameTime(getGameTime() + 1);
 
         for (TimedAction action : new ArrayList<>(timedActions)) action.update(getGameTime());
-        if (UHCManager.getInstance().getCurrentGameState() != UHCManager.GameState.ENDING) if (UHCManager.getInstance().getGame().getGamePlayers().size() < 2) {
-            UHCManager.getInstance().getGame().endGame(Collections.singletonList(UHCManager.getInstance().getGame().getGamePlayers().get(0)));
-            cancel();
+
+        if ((int) MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getValue() != 1) updateTeamWaypoints();
+
+        if (UHCManager.getInstance().getCurrentGameState() != UHCManager.GameState.ENDING) {
+            if (UHCManager.getInstance().getGame().getGamePlayers().size() < 2) {
+                if (CombatLogger.getLoggers().size() > 0) return;
+                UHCManager.getInstance().getGame().endGame(Collections.singletonList(UHCManager.getInstance().getGame().getGamePlayers().get(0)));
+                cancel();
+                return;
+            }
+
+            if ((int) MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getValue() != 1) {
+                List<Team> remainingTeams = new ArrayList<>();
+
+                for (UHCPlayer p : UHCManager.getInstance().getGame().getGamePlayers()) if (!remainingTeams.contains(p.getCurrentTeam())) remainingTeams.add(p.getCurrentTeam());
+                for (UUID logger : CombatLogger.getLoggers().keySet()) {
+                    for (Team team : TeamManager.getInstance().getTeamsList()) {
+                        if (team.isMember(logger)) if (!remainingTeams.contains(team)) {
+                            remainingTeams.add(team);
+                            break;
+                        }
+                    }
+                }
+
+                if (remainingTeams.size() < 2) {
+                    UHCManager.getInstance().getGame().endGame(UHCManager.getInstance().getGame().getGamePlayers());
+                    cancel();
+                }
+            }
         }
+    }
+
+    private void updateTeamWaypoints() {
+
     }
 
     private void setGameTime(int i) {

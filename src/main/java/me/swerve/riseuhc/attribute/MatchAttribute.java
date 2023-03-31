@@ -15,6 +15,7 @@ import me.swerve.riseuhc.attribute.attribute.nether.PortalCamping;
 import me.swerve.riseuhc.attribute.attribute.nether.Speed;
 import me.swerve.riseuhc.attribute.attribute.nether.Strength;
 import me.swerve.riseuhc.attribute.attribute.teams.CrossTeaming;
+import me.swerve.riseuhc.attribute.attribute.teams.TeamSize;
 import me.swerve.riseuhc.attribute.attribute.timing.BorderTime;
 import me.swerve.riseuhc.attribute.attribute.timing.FinalHealTime;
 import me.swerve.riseuhc.attribute.attribute.timing.MeetupTime;
@@ -84,5 +85,6 @@ public abstract class MatchAttribute {
         new NotchApples();
         new GoldenHeads();
         new FinalHealTime();
+        new TeamSize();
     }
 }

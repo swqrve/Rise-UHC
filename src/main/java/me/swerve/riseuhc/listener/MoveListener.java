@@ -12,7 +12,7 @@ public class MoveListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         UHCPlayer p = UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId());
-        if (p.getCurrentState() == UHCPlayer.PlayerState.PLAYING || p.getCurrentState() == UHCPlayer.PlayerState.SPECTATING) BorderUtil.updatePlayer(e.getPlayer());
+        if (p.getCurrentState() == UHCPlayer.PlayerState.PLAYING || p.getCurrentState() == UHCPlayer.PlayerState.SPECTATING) BorderUtil.updatePlayer(e.getPlayer(), false);
 
         if (p.isInPractice()) if (p.getPlayerObject().getLocation().getY() > 110) p.sendToPractice();
     }

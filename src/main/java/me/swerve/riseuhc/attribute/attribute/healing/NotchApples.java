@@ -10,6 +10,6 @@ public class NotchApples extends MatchAttribute {
         getOptions().add(new AttributeValue("On", true));
         getOptions().add(new AttributeValue("Off", false));
 
-        setCurrentSelection(getOptions().get(0));
+        setCurrentSelection(getOptions().get(1));
     }
 }

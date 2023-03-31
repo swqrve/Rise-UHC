@@ -54,6 +54,10 @@ public class UHCManager {
 
     private Date scheduleDate = null;
 
+    private final List<UUID> toggledVisibility = new ArrayList<>();
+    private final HashMap<UUID, Long> lastToggledVisibility = new HashMap<>();
+    private final ItemCreator toggleVisibilityItem = new ItemCreator(Material.INK_SACK, 1).setData(8).setName("&aVanish").addLore(Collections.singletonList("&7Right click to toggle vanish"));
+
     private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     public UHCManager() {
         instance = this;
@@ -80,6 +84,7 @@ public class UHCManager {
 
         modSpectatorInventory.put(4, new ItemCreator(Material.TRIPWIRE_HOOK, 1).setName("&6Toggle Alerts &7(Right Click)").addLore(Collections.singletonList("&7Right Click to toggle your alerts!")).getItem());
 
+        modSpectatorInventory.put(6, toggleVisibilityItem.getItem());
         modSpectatorInventory.put(7, new ItemCreator(Material.DIAMOND_ORE, 1).setName("&6Diamond Top &7(Right Click)").addLore(Collections.singletonList("&7Right Click to view Diamond Top!")).getItem());
         modSpectatorInventory.put(8, new ItemCreator(Material.GOLD_ORE, 1).setName("&6Gold Top &7(Right Click)").addLore(Collections.singletonList("&7Right Click to view Gold Top!")).getItem());
 

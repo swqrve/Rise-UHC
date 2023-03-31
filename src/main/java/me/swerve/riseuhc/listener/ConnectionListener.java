@@ -5,9 +5,16 @@ import me.swerve.riseuhc.RiseUHC;
 import me.swerve.riseuhc.manager.UHCManager;
 import me.swerve.riseuhc.player.UHCPlayer;
 import me.swerve.riseuhc.player.logger.CombatLogger;
+import me.swerve.riseuhc.util.KillTopPlayer;
+import me.swerve.riseuhc.util.OreUtil;
 import me.swerve.riseuhc.util.TimeUtil;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutScoreboardObjective;
+import net.minecraft.server.v1_8_R3.ScoreboardObjective;
+import net.minecraft.server.v1_8_R3.ScoreboardServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -68,14 +75,29 @@ public class ConnectionListener implements Listener {
         e.setJoinMessage(null);
         //  e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', "&7[&a+&7] &7" + e.getPlayer().getDisplayName()));
 
-        new UHCPlayer(e.getPlayer());
+        UHCPlayer player = new UHCPlayer(e.getPlayer());
         for (UHCPlayer p : UHCPlayer.getUhcPlayers().values()) p.hideSpectators();
 
         if (UHCManager.getInstance().getCurrentGameState() == UHCManager.GameState.PLAYING) UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).setSpectator();
         if (CombatLogger.getLoggers().get(e.getPlayer().getUniqueId()) != null) UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).useCombatLogger();
 
+        for (KillTopPlayer p : KillTopPlayer.getKillers()) if (p.getName().equalsIgnoreCase(e.getPlayer().getDisplayName())) {
+            player.setCurrentKills(p.getKills());
+            break;
+        }
+
+        for (OreUtil p : OreUtil.getMiners()) if (p.getName().equalsIgnoreCase(e.getPlayer().getDisplayName())) {
+            player.setCurrentDiamondsMined(p.getMinedDiamonds());
+            player.setCurrentGoldMined(p.getMinedGold());
+            break;
+        }
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(RiseUHC.getInstance(), () -> {
             Scoreboard scoreboard = e.getPlayer().getScoreboard();
+
+            Objective health = scoreboard.registerNewObjective("tab", "health");
+            health.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+            health.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&4❤"));
 
             Objective name = scoreboard.registerNewObjective("name", "health");
             name.setDisplaySlot(DisplaySlot.BELOW_NAME);
@@ -85,9 +107,9 @@ public class ConnectionListener implements Listener {
             scoreboard.getTeam("color").setPrefix(ChatColor.translateAlternateColorCodes('&', "&c"));
             scoreboard.getTeam("color").addPlayer(e.getPlayer());
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                e.getPlayer().getScoreboard().getTeam("color").addPlayer(player);
-                player.getScoreboard().getTeam("color").addPlayer(e.getPlayer());
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                e.getPlayer().getScoreboard().getTeam("color").addPlayer(p);
+                p.getScoreboard().getTeam("color").addPlayer(e.getPlayer());
             }
         }, 20);
     }
@@ -97,7 +119,20 @@ public class ConnectionListener implements Listener {
         e.setQuitMessage(null);
        // e.setQuitMessage(ChatColor.translateAlternateColorCodes('&', "&7[&c-&7] &7" + e.getPlayer().getDisplayName()));
 
-        if (UHCManager.getInstance().getGame() != null) if (UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentState() == UHCPlayer.PlayerState.PLAYING) Bukkit.getPluginManager().registerEvents(new CombatLogger(e.getPlayer()), RiseUHC.getInstance());
+        if (UHCManager.getInstance().getGame() != null) if (UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentState() == UHCPlayer.PlayerState.PLAYING) {
+            Bukkit.getPluginManager().registerEvents(new CombatLogger(e.getPlayer(), UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentKills()), RiseUHC.getInstance());
+
+            boolean found = false;
+
+            for (OreUtil savedOres : OreUtil.getMiners()) if (savedOres.getName().equalsIgnoreCase(e.getPlayer().getDisplayName())) {
+                found = true;
+                savedOres.setMinedDiamonds(UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentDiamondsMined());
+                savedOres.setMinedGold(UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentGoldMined());
+            }
+
+            if (!found) new OreUtil(e.getPlayer().getDisplayName(), UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentDiamondsMined(), UHCPlayer.getUhcPlayers().get(e.getPlayer().getUniqueId()).getCurrentGoldMined());
+        }
+
         UHCPlayer.getUhcPlayers().remove(e.getPlayer().getUniqueId());
     }
 }

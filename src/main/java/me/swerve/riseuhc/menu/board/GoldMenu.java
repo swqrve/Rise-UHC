@@ -6,6 +6,7 @@ import me.swerve.riseuhc.menu.Page;
 import me.swerve.riseuhc.player.UHCPlayer;
 import me.swerve.riseuhc.util.ItemCreator;
 import me.swerve.riseuhc.util.SortUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class GoldMenu extends Menu {
                 if (playersToSort.size() < 1) break;
                 UHCPlayer player = playersToSort.get(0);
 
-                page.put(b, new ItemCreator(Material.SKULL_ITEM, 1).setName("&6" + player.getPlayerObject().getDisplayName()).setOwner(player.getPlayerObject().getName()).addLore(Arrays.asList("&6Gold &7Mined: " + player.getCurrentGoldMined(), "&7Click to teleport to the player!")).getItem());
+                page.put(b, new ItemCreator(Material.SKULL_ITEM, 1).setName("&6" + player.getPlayerObject().getDisplayName()).addLore(Arrays.asList("&6Gold &7Mined: " + player.getCurrentGoldMined(), "&7Click to teleport to the player!")).setOwner(player.getPlayerObject().getName()).getItem());
                 playersToSort.remove(0);
             }
 
@@ -52,7 +53,19 @@ public class GoldMenu extends Menu {
         updateInventory(p);
     }
 
-    @Override public void clickedItem(Inventory inventory, InventoryClickEvent e, Page currentPage) { }
+    @Override public void clickedItem(Inventory inventory, InventoryClickEvent e, Page currentPage) {
+        if (e.getCurrentItem() == null) return;
+        if (e.getCurrentItem().getType() != Material.SKULL_ITEM) return;
+
+        String playerName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+        for (Player p : Bukkit.getOnlinePlayers()) if (ChatColor.stripColor(p.getDisplayName()).equalsIgnoreCase(playerName)) {
+            e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', "&aTeleporting you to " + playerName + "!"));
+            e.getWhoClicked().teleport(p.getLocation());
+            return;
+        }
+
+        e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', "&cCouldn't find that player, did they log off?"));
+    }
 
     @Override public void lastChance(Inventory inventory) { }
 }

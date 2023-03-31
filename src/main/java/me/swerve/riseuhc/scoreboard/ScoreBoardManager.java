@@ -53,7 +53,7 @@ public class ScoreBoardManager implements AssembleAdapter {
                 lines.add("&7riseuhc.club");
             } else {
                 lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
-                lines.add("&6Type: &fFFA"); // TODO: Make it based on the actual team size
+                lines.add("&6Type: &f" + MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getName());
                 lines.add("");
                 lines.add("&6Border: &7[&f" + MatchAttribute.getAttributeFromName("Border").getCurrentSelection().getValue() + "x" + MatchAttribute.getAttributeFromName("Border").getCurrentSelection().getValue() + "&7]");
                 lines.add("");
@@ -113,11 +113,20 @@ public class ScoreBoardManager implements AssembleAdapter {
         }
 
         if (UHCManager.getInstance().getCurrentGameState() == UHCManager.GameState.ENDING) {
-            lines.add("&6Winners:");
-            lines.add("&f" + UHCManager.getInstance().getGame().getWinner().getDisplayName());
-            lines.add("");
-            lines.add("&6Kills:");
-            lines.add("&f" + UHCManager.getInstance().getGame().getWinner().getCurrentKills());
+            if ((int) MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getValue() == 1) {
+                lines.add("&6Winner:");
+                lines.add("&f" + UHCManager.getInstance().getGame().getWinner().getDisplayName());
+                lines.add("");
+                lines.add("&6Kills:");
+                lines.add("&f" + UHCManager.getInstance().getGame().getWinner().getCurrentKills());
+            } else {
+                lines.add("&6Winners:");
+                lines.add("&f Team #" + UHCManager.getInstance().getGame().getWinner().getCurrentTeam().getTeamNumber());
+                lines.add("");
+                lines.add("&6Team Kills:");
+                lines.add("&f" + UHCManager.getInstance().getGame().getTeamKills());
+            }
+
             lines.add("");
             lines.add("&6Closing in:");
             lines.add("&f" + UHCManager.getInstance().getGame().getSecondsTillRestart());

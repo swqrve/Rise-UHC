@@ -11,6 +11,6 @@ public class Speed extends MatchAttribute {
         getOptions().add(new AttributeValue("Speed 1", 1));
         getOptions().add(new AttributeValue("Off", false));
 
-        setCurrentSelection(getOptions().get(0));
+        setCurrentSelection(getOptions().get(2));
     }
 }

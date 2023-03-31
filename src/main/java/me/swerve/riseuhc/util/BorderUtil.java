@@ -55,7 +55,15 @@ public class BorderUtil {
         if (teleportNeeded) {
             double playerY = 0;
             if (!onBorderShrink) playerY = p.getLocation().getY();
-            if (playerY == 0) playerY = getHighestBlockY((int) playerX, (int) playerZ, Bukkit.getWorld("uhc_world")) + 2;
+
+            if (playerY == 0) {
+                boolean safeCave = Bukkit.getWorld("uhc_world").getBlockAt((int) playerX, p.getLocation().getBlockY(), (int) playerZ).isEmpty();
+                for (int i = 5; i >= 0; i--) if (Bukkit.getWorld("uhc_world").getBlockAt((int) playerX, p.getLocation().getBlockY() - i, (int) playerZ).isLiquid()) safeCave = false;
+
+                playerY = getHighestBlockY((int) playerX, (int) playerZ, Bukkit.getWorld("uhc_world")) + 3;
+
+                if (!(limit == 500 || limit == 100)) if (safeCave) playerY = p.getLocation().getBlockY();
+            }
 
             if (onBorderShrink && (limit == 500 || limit == 100)) {
                 playerX = rand.nextInt(limit) * (rand.nextBoolean() ? -1 : 1);
@@ -71,7 +79,7 @@ public class BorderUtil {
     }
 
     public static void updatePlayer(Entity p) {
-        updatePlayer(p, false);
+        updatePlayer(p);
     }
 
     public static void createBedrockWall(int radius) {

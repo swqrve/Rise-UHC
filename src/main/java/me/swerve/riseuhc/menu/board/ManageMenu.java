@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -102,8 +103,13 @@ public class ManageMenu extends Menu {
             int index = 0;
             for (int i = 0; i < attribute.getOptions().size(); i++) if (attribute.getOptions().get(i).getName().equals(attribute.getCurrentSelection().getName())) index = i;
 
-            if (index + 1 == attribute.getOptions().size()) index = -1;
-            index++;
+            if (e.getClick().toString().toLowerCase().contains("left")) {
+                if (index + 1 == attribute.getOptions().size()) index = -1;
+                index++;
+            } else {
+                if (index == 0) index = attribute.getOptions().size();
+                index--;
+            }
 
             attribute.setCurrentSelection(attribute.getOptions().get(index));
 

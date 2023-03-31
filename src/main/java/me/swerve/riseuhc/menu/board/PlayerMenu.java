@@ -74,16 +74,14 @@ public class PlayerMenu extends Menu {
             return;
         }
 
-        if (hasPermission) {
-            ((Player) e.getWhoClicked()).sendMessage(ChatColor.translateAlternateColorCodes('&', "&f[&6RiseUHC&f] &fYou've been teleported to " + foundPlayer.getPlayerObject().getDisplayName()));
-            e.getWhoClicked().closeInventory();
-            e.getWhoClicked().teleport(foundPlayer.getPlayerObject().getLocation());
+        if (!hasPermission && foundPlayer.getPlayerObject().getLocation().distance(new Location(Bukkit.getWorld("uhc_world"), 0, 60, 0)) > 100) {
+            unavailablePlayer(e.getWhoClicked());
             return;
         }
 
-        if (foundPlayer.getPlayerObject().getLocation().distance(new Location(Bukkit.getWorld("uhc_world"), 0, 60, 0)) > 100) {
-            unavailablePlayer(e.getWhoClicked());
-        }
+        ((Player) e.getWhoClicked()).sendMessage(ChatColor.translateAlternateColorCodes('&', "&f[&6RiseUHC&f] &fYou've been teleported to " + foundPlayer.getPlayerObject().getDisplayName()));
+        e.getWhoClicked().closeInventory();
+        e.getWhoClicked().teleport(foundPlayer.getPlayerObject().getLocation());
     }
 
     private void unavailablePlayer(HumanEntity e) {

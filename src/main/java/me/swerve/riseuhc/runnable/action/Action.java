@@ -2,6 +2,7 @@ package me.swerve.riseuhc.runnable.action;
 
 import me.swerve.riseuhc.RiseUHC;
 import me.swerve.riseuhc.attribute.MatchAttribute;
+import me.swerve.riseuhc.event.PvPEnableEvent;
 import me.swerve.riseuhc.manager.UHCManager;
 import me.swerve.riseuhc.player.logger.CombatLogger;
 import me.swerve.riseuhc.scenario.Scenario;
@@ -24,6 +25,8 @@ public class Action {
         switch (actionType) {
             case ENABLE_PVP:
                 UHCManager.getInstance().setPvpEnabled(true);
+                PvPEnableEvent event = new PvPEnableEvent();
+                Bukkit.getServer().getPluginManager().callEvent(event);
                 break;
             case FINAL_HEAL:
                 for (Player player : Bukkit.getOnlinePlayers()) player.setHealth(20);
@@ -36,13 +39,14 @@ public class Action {
                 UHCManager.getInstance().getGame().setCurrentBorder(newBorderSize);
 
                 if (newBorderSize <= 100) if (!Scenario.getScenarioByTitle("DoNotDisturb").isEnabled()) Scenario.getScenarioByTitle("DoNotDisturb").setState(true);
+                if (newBorderSize <= 100) if (Scenario.getScenarioByTitle("TimeBomb").isEnabled()) if (!Scenario.getScenarioByTitle("SafeLoot").isEnabled()) Scenario.getScenarioByTitle("SafeLoot").setState(true);
 
                 if ((boolean) MatchAttribute.getAttributeFromName("Border Resistance").getCurrentSelection().getValue()) {
                     UHCManager.getInstance().setBorderShrinkResistance(true);
                     Bukkit.getScheduler().scheduleSyncDelayedTask(RiseUHC.getInstance(), () -> { UHCManager.getInstance().setBorderShrinkResistance(false); }, 60);
                 }
 
-                for (Player player : Bukkit.getOnlinePlayers()) BorderUtil.updatePlayer(player);
+                for (Player player : Bukkit.getOnlinePlayers()) BorderUtil.updatePlayer(player, true);
                 for (CombatLogger logger : CombatLogger.getLoggers().values()) BorderUtil.updatePlayer(logger.getLogger(), true);
 
                 int borderTime = UHCManager.getInstance().getGame().getGameTime() + (5 * 60);

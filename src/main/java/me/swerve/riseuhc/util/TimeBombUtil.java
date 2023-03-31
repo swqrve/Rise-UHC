@@ -2,6 +2,7 @@ package me.swerve.riseuhc.util;
 
 import de.inventivegames.hologram.Hologram;
 import de.inventivegames.hologram.HologramAPI;
+import lombok.Getter;
 import me.swerve.riseuhc.RiseUHC;
 import me.swerve.riseuhc.manager.UHCManager;
 import org.bukkit.Bukkit;
@@ -10,19 +11,27 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
+@Getter
 public class TimeBombUtil {
     private final String name;
     private final Location location;
     private final List<ItemStack> drops;
-    public TimeBombUtil(String name, List<ItemStack> drops, Location deathLocation) {
+
+    private TimeBombChest timeBombChest;
+
+    @Getter private String killerName;
+    public TimeBombUtil(String name, List<ItemStack> drops, Location deathLocation, Player killer) {
         this.name = name;
         this.drops = drops;
         this.location = deathLocation;
+        this.killerName = "";
+        if (killer != null) this.killerName = killer.getDisplayName();
 
         handleDeath();
     }
@@ -42,15 +51,15 @@ public class TimeBombUtil {
 
         chest.getInventory().addItem(UHCManager.getInstance().getGoldenHead());
 
-        new TimeBombChest(name, chest).runTaskTimer(RiseUHC.getInstance(), 0, 20L);
+        (timeBombChest = new TimeBombChest(name, chest)).runTaskTimer(RiseUHC.getInstance(), 0, 20L);
     }
 
     public static class TimeBombChest extends BukkitRunnable {
 
         private final String name;
-        private final Chest chest;
+        @Getter private final Chest chest;
         private final Hologram hologram;
-        private final Cooldown cooldown;
+        @Getter private final Cooldown cooldown;
 
         TimeBombChest(String name, Chest chest) {
             this.name = name;
@@ -85,6 +94,7 @@ public class TimeBombUtil {
                     this.chest.getBlock().breakNaturally();
                     chest.getBlock().breakNaturally();
                 }
+
                 this.chest.getLocation().getWorld().createExplosion(this.chest.getLocation(), 5f);
 
                 Bukkit.broadcastMessage("§7[§6TimeBomb§7] §f" + this.name + "'s corpse has exploded!");

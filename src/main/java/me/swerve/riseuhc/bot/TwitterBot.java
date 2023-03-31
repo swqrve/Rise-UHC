@@ -1,6 +1,7 @@
 package me.swerve.riseuhc.bot;
 
 import lombok.Getter;
+import me.swerve.riseuhc.attribute.MatchAttribute;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -36,7 +37,7 @@ public class TwitterBot {
         twitterInstance.updateStatus(
                 "Rise UHC [1.7-1.8]\n" +
                 "\n" +
-                "Type: FFA\n" +
+                "Type: " + MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getName() + "\n" +
                 "\n" +
                 "Scenarios: " + scenarios + "\n" +
                 "\n" +

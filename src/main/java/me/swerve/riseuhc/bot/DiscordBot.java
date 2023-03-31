@@ -8,6 +8,7 @@ import discord4j.core.spec.EmbedCreateFields;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import lombok.Getter;
+import me.swerve.riseuhc.attribute.MatchAttribute;
 
 import javax.security.auth.login.LoginException;
 
@@ -25,7 +26,7 @@ public class DiscordBot {
     public void announceGame(String scenario, String time) {
         EmbedCreateSpec build = EmbedCreateSpec.builder()
                 .title("RiseUHC")
-                .addField(EmbedCreateFields.Field.of("Team Size ⇒", "FFA", true))
+                .addField(EmbedCreateFields.Field.of("Team Size ⇒", MatchAttribute.getAttributeFromName("Team Size").getCurrentSelection().getName(), true))
                 .addField(EmbedCreateFields.Field.of("IP ⇒", "riseuhc.club", true))
                 .addField(EmbedCreateFields.Field.of("Open Time ⇒", time + " UTC", true))
                 .addField(EmbedCreateFields.Field.of("Scenarios ⇒", scenario, false))

@@ -45,3 +45,10 @@ commands:
     aliases: [latejoin]
   cancel:
   heal:
+  team:
+    aliases: [ t, tl, sc, sendcoords, pmcoords ]
+  crash:
+    aliases: [ bitch, fuckyou, beaner, shitter]
+  fly:
+  gm:
+    aliases: [ gmc, gms, gma ]

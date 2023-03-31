@@ -92,7 +92,7 @@ public class BlockListener implements Listener {
             e.getBlock().getDrops().clear();
 
             if (e.getPlayer().getItemInHand().getType() != Material.SHEARS) return;
-            if (Scenario.getRandom().nextInt(100) > ((int) MatchAttribute.getAttributeFromName("Apple Rate").getCurrentSelection().getValue())) ItemUtil.dropItem(new ItemStack(Material.APPLE), e.getBlock().getLocation());
+            if (((int) MatchAttribute.getAttributeFromName("Apple Rate").getCurrentSelection().getValue()) > Scenario.getRandom().nextInt(100)) ItemUtil.dropItem(new ItemStack(Material.APPLE), e.getBlock().getLocation());
         }
 
     }
@@ -103,12 +103,4 @@ public class BlockListener implements Listener {
         if (((int) MatchAttribute.getAttributeFromName("Apple Rate").getCurrentSelection().getValue()) > Scenario.getRandom().nextInt(100)) ItemUtil.dropItem(new ItemStack(Material.APPLE), e.getBlock().getLocation());
     }
 
-/*    public void dropItems(BlockBreakEvent e) {
-        if (e.isCancelled()) return;
-
-        if (e.getBlock().getDrops().size() > 0) {
-            for (int i = 0; i < e.getBlock().getDrops().size(); i++)
-                ItemDropUtil.naturallyDropItem((ItemStack) e.getBlock().getDrops().toArray()[i], e.getBlock().getLocation());
-        }
-    }*/
 }

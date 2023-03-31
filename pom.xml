@@ -94,6 +94,13 @@
             <systemPath>${project.basedir}/libs/craftbukkit-1.8.8-R0.1-SNAPSHOT-latest.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.lunar</groupId>
+            <artifactId>lunar-server</artifactId>
+            <version>1.7.10</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/bukkitapi.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.22</version>

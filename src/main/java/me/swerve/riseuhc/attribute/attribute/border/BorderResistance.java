@@ -10,6 +10,6 @@ public class BorderResistance extends MatchAttribute{
         getOptions().add(new AttributeValue("On - 3 Seconds", true));
         getOptions().add(new AttributeValue("Off", false));
 
-        setCurrentSelection(getOptions().get(0));
+        setCurrentSelection(getOptions().get(1));
     }
 }

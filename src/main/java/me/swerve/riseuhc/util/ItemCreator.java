@@ -22,7 +22,12 @@ public class ItemCreator {
         this.meta = item.getItemMeta();
     }
 
+    public ItemCreator(ItemCreator toClone) {
+        this.item = new ItemStack(toClone.getItem().getType(), toClone.getItem().getAmount());
+        this.meta = toClone.getMeta();
 
+        updateMeta();
+    }
     public ItemCreator setName(String name) {
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 

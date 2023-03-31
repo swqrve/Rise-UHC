@@ -80,5 +80,7 @@ public abstract class Scenario implements Listener {
         new Timber();
         new TimeBomb();
         new DoNotDisturb();
+        new SafeLoot();
+        new Radar();
     }
 }

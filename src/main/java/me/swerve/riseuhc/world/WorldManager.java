@@ -207,7 +207,7 @@ public class WorldManager implements Listener {
 class CanePopulator extends BlockPopulator {
     @Override
     public void populate(World world, Random random, Chunk chunk) {
-        if (random.nextInt(100) < 50) return;
+        if (random.nextInt(100) < 40) return;
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 Block block = getHighestBlock(chunk, i, j);
@@ -225,7 +225,7 @@ class CanePopulator extends BlockPopulator {
             if (block.getRelative(face).getType().toString().toLowerCase().contains("water")) validPosition = true;
         }
 
-        if (!validPosition || (rand.nextInt(100) < 75)) return;
+        if (!validPosition || (rand.nextInt(100) < 65)) return;
         for (int i = 1; i < rand.nextInt(5) + 1; i++) {
             block.getRelative(0, i, 0).setType(Material.SUGAR_CANE_BLOCK);
         }

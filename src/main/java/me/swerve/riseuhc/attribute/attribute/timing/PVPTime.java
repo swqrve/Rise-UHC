@@ -8,8 +8,8 @@ public class PVPTime extends MatchAttribute {
         super(Section.TIMING, "PVP Time");
 
         for (int i = 8; i > 2; i--) getOptions().add(new AttributeValue("" + 5 * i, 5 * i));
-        getOptions().add(new AttributeValue("2", 2));
+        getOptions().add(new AttributeValue("10", 10));
 
-        setCurrentSelection(getOptions().get(3));
+        setCurrentSelection(getOptions().get(4));
     }
 }
